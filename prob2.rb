@@ -3,7 +3,7 @@ require 'json'
 
 api_key = 'f88f1be7b7027ee6721cee96'
 from_currency = 'USD'
-to_currency = 'EUR'
+to_currency = 'AUD'
 amount = 100
 
 response = HTTParty.get("https://api.exchangerate-api.com/v4/latest/#{from_currency}?symbols=#{to_currency}")
