@@ -1,19 +1,36 @@
-require 'httparty'
+require 'net/http'
 require 'json'
 
-api_key = 'OELYBA6VSXCDVQOTKPWC'
-event_id = '873038440477'
+API_KEY = 'GOnNjG0vaLJXuRhC9XPGOGPGTlim6gfO'
+city = 'Memphis'
+def get_events(city)
+  url = URI("https://app.ticketmaster.com/discovery/v2/events.json?apikey=#{API_KEY}&city=#{city}")
+  response = Net::HTTP.get(url)
+  events_data = JSON.parse(response)
+  events_data['_embedded']['events']
+end
 
-response = HTTParty.get("https://www.eventbriteapi.com/v3/events/#{event_id}/?expand=venue&token=#{api_key}")
-data = JSON.parse(response.body)
+def display_events(events)
+  events.each do |event|
+    name = event['name']
+    venue = event['_embedded']['venues'].first['name']
+    date = event['dates']['start']['localDate']
+    time = event['dates']['start']['localTime']
+    date_time = "#{date} #{time}" if date && time
+    puts "Event: #{name}"
+    puts "Venue: #{venue}"
+    puts "Date & Time: #{date_time}"
+    puts "--------------------------------------"
+  end
+end
 
-
-event_name = data['name']['text']
-venue_name = data['venue']['name']
-venue_address = data['venue']['address']['localized_address_display']
-start_time = data['start']['local']
-
-puts "Event: #{event_name}"
-puts "Venue: #{venue_name}"
-puts "Address: #{venue_address}"
-puts "Start Time: #{start_time}"
+# Main
+puts "Enter the city to search for events:"
+city = gets.chomp
+events = get_events(city)
+if events.nil?
+  puts "No events found in #{city}."
+else
+  puts "Upcoming events in #{city}:"
+  display_events(events)
+end
